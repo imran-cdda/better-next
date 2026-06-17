@@ -15,6 +15,20 @@
       "when": 1781517813093,
       "tag": "0001_wise_justice",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1781596077995,
+      "tag": "0002_long_jack_murdock",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1781679258478,
+      "tag": "0003_majestic_shooting_star",
+      "breakpoints": true
     }
   ]
 }

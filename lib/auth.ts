@@ -6,7 +6,9 @@ import { drizzleAdapter } from "better-auth/adapters/drizzle"
 import { db } from "@/core/db"
 import * as schema from "@/core/db/schema/index"
 import { email } from "@/plugins/email"
-import { orgDbPlugin } from "@/plugins/database/server"
+import { DBPlugin } from "@/plugins/database/server"
+import { apiKey } from "@better-auth/api-key"
+import { Post } from "@/plugins/post/server"
 
 export const auth = betterAuth({
   database: drizzleAdapter(db, { provider: "pg", schema }),
@@ -16,9 +18,10 @@ export const auth = betterAuth({
   basePath: "/api/auth",
   trustedOrigins: [
     "http://localhost:3000",
-    "https://localhost",
-    "http://127.0.0.1:3000",
     "http://mdimranh.com:3000",
+    "http://test.com:3000",
+    "http://abc.com:3000",
+    "http://maruf.com:3000",
   ],
   emailAndPassword: {
     enabled: true,
@@ -35,7 +38,15 @@ export const auth = betterAuth({
         process.env.GITHUB_CLIENT_SECRET || "GITHUB_CLIENT_SECRET_PLACEHOLDER",
     },
   },
-  plugins: [orgDbPlugin(), nextCookies(), openAPI(), passkey(), email()],
+  plugins: [
+    DBPlugin(),
+    nextCookies(),
+    openAPI(),
+    passkey(),
+    email(),
+    apiKey(),
+    Post(),
+  ],
   logger: {
     level: "debug",
   },

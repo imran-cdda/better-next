@@ -30,6 +30,7 @@ import {
   MessageCircle,
   LayoutDashboard,
   Database,
+  FileText,
 } from "lucide-react"
 
 // This is sample data.
@@ -71,6 +72,11 @@ const data = {
     },
   ],
   templates: [
+    {
+      title: "Posts",
+      url: "/admin/post",
+      icon: <FileText />,
+    },
     {
       title: "Database",
       url: "/admin/database",
