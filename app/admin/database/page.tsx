@@ -73,7 +73,9 @@ export default function DatabasePage() {
   const [editingId, setEditingId] = React.useState<string | null>(null)
   const [formData, setFormData] =
     React.useState<DatabaseFormData>(initialFormData)
-  const [connectionStatus, setConnectionStatus] = React.useState<Record<string, boolean | null>>({})
+  const [connectionStatus, setConnectionStatus] = React.useState<
+    Record<string, boolean | null>
+  >({})
   const [migratingDb, setMigratingDb] = React.useState<string | null>(null)
   const [checkingDb, setCheckingDb] = React.useState<string | null>(null)
 
@@ -174,7 +176,9 @@ export default function DatabasePage() {
   const handleCheckConnection = async (id: string) => {
     setCheckingDb(id)
     try {
-      const { data, error } = await authClient.database.checkConnection({ databaseId: id })
+      const { data, error } = await authClient.database.checkConnection({
+        databaseId: id,
+      })
       if (error) {
         toast.error("Failed to check connection")
         setConnectionStatus((prev) => ({ ...prev, [id]: false }))
@@ -198,7 +202,9 @@ export default function DatabasePage() {
   const handleMigrate = async (id: string) => {
     setMigratingDb(id)
     try {
-      const { data, error } = await authClient.database.migrate({ databaseId: id })
+      const { data, error } = await authClient.database.migrate({
+        databaseId: id,
+      })
       if (error) {
         toast.error("Migration failed")
         return
@@ -374,11 +380,19 @@ export default function DatabasePage() {
                     <td className="px-4 py-3">
                       <div className="flex items-center justify-center gap-1">
                         {connectionStatus[db.id] === true ? (
-                          <CheckCircleIcon className="size-4 text-green-500" title="Connected" />
+                          <CheckCircleIcon
+                            className="size-4 text-green-500"
+                            title="Connected"
+                          />
                         ) : connectionStatus[db.id] === false ? (
-                          <XCircleIcon className="size-4 text-destructive" title="Disconnected" />
+                          <XCircleIcon
+                            className="size-4 text-destructive"
+                            title="Disconnected"
+                          />
                         ) : (
-                          <span className="text-xs text-muted-foreground">—</span>
+                          <span className="text-xs text-muted-foreground">
+                            —
+                          </span>
                         )}
                       </div>
                     </td>

@@ -3,7 +3,7 @@ import { DynamicDB } from "../database/onRequest"
 import { createAuthEndpoint } from "better-auth/api"
 import { z } from "zod"
 
-export const Post = (): BetterAuthPlugin =>
+export const Post = () =>
   ({
     id: "post",
     // onRequest: DynamicDB(async (request, context) => {

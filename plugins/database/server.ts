@@ -10,7 +10,7 @@ import { schemas } from "./schema"
 import { endpoints } from "./endpoints"
 import { dynamicDB } from "./hooks"
 
-export const DBPlugin = (): BetterAuthPlugin =>
+export const DBPlugin = () =>
   ({
     id: "database",
     // hooks: {
