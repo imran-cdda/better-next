@@ -16,7 +16,7 @@ export class PostgresDBService extends BaseDBService {
 
   buildConnectionUrl(): string {
     const { user, password, host, port, database } = this.details
-    const url = `postgres://${user}:${password}@${host}:${port}/${database}`
+    const url = `postgres://${user}:${password}@${host}:${port}/${database}?sslmode=require`
     console.log("Connection url --------------> ", url)
     return url
   }
@@ -36,7 +36,7 @@ export class PostgresDBService extends BaseDBService {
   async ensureDatabaseExists(): Promise<void> {
     const { user, password, host, port, database } = this.details
     const adminClient = new Client({
-      connectionString: `postgres://${user}:${password}@${host}:${port}/postgres`,
+      connectionString: `postgres://${user}:${password}@${host}:${port}/${database}?sslmode=require`,
     })
     await adminClient.connect()
 
