@@ -26,7 +26,7 @@ async function getConnectionStringForDomain(
   })) as any
 
   const url =
-    domain === "localhost"
+    domain === "better-next-nu.vercel.app"
       ? process.env.DATABASE_URL
       : getDomainConfig
         ? `postgresql://${getDomainConfig?.user}:${getDomainConfig?.password}@${getDomainConfig?.host}:${getDomainConfig?.port}/${getDomainConfig?.database}?sslmode=require`
