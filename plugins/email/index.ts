@@ -990,7 +990,7 @@ export const email = <O extends EmailOptions>(options?: O) => {
           name: z.string().min(1).max(255),
           model: z.string().min(1).max(255),
           event: z.string().min(1).max(255),
-          criteria: z.record(z.any()).optional(),
+          criteria: z.object(z.any()).optional(),
           subject: z.string().min(1),
           to: z.string().min(1),
           cc: z.string().optional(),
@@ -1133,7 +1133,7 @@ export const email = <O extends EmailOptions>(options?: O) => {
           name: z.string().min(1).max(255).optional(),
           model: z.string().min(1).max(255).optional(),
           event: z.string().min(1).max(255).optional(),
-          criteria: z.record(z.any()).optional(),
+          criteria: z.object(z.any()).optional(),
           subject: z.string().min(1).optional(),
           to: z.string().min(1).optional(),
           cc: z.string().optional(),
@@ -1177,7 +1177,7 @@ export const email = <O extends EmailOptions>(options?: O) => {
         return {
           success: true,
           template: {
-            ...updated,
+            ...(updated as any),
             criteria: (updated as any).criteria
               ? JSON.parse((updated as any).criteria)
               : null,
@@ -1280,47 +1280,47 @@ export const email = <O extends EmailOptions>(options?: O) => {
             }))
 
             // Relation fields derived from foreign keys
-            for (const fk of config.foreignKeys) {
-              try {
-                // fk.reference() returns the referenced columns array
-                const referencedColumns = fk.reference()
-                if (!referencedColumns?.length) continue
+            // for (const fk of config.foreignKeys) {
+            //   try {
+            //     // fk.reference() returns the referenced columns array
+            //     const referencedColumns = fk.reference()
+            //     if (!referencedColumns?.length || 0) continue
 
-                // Get the table the FK points to
-                const referencedTable = (referencedColumns[0] as any).table
-                const referencedTableConfig = getTableConfig(referencedTable)
-                const referencedTableName = referencedTableConfig.name
+            //     // Get the table the FK points to
+            //     const referencedTable = (referencedColumns[0] as any).table
+            //     const referencedTableConfig = getTableConfig(referencedTable)
+            //     const referencedTableName = referencedTableConfig.name
 
-                // Resolve back to the JS export key (e.g. "user", "session")
-                const relatedModelKey =
-                  tableNameToExportKey.get(referencedTableName)
-                if (!relatedModelKey) continue
+            //     // Resolve back to the JS export key (e.g. "user", "session")
+            //     const relatedModelKey =
+            //       tableNameToExportKey.get(referencedTableName)
+            //     if (!relatedModelKey) continue
 
-                // Derive a friendly relation field name from the FK column
-                // e.g. userId → user, organizationId → organization
-                const fkColName = fk.columns[0]?.name ?? ""
-                const relationFieldName = fkColName
-                  .replace(/([A-Z])/g, "_$1")
-                  .toLowerCase()
-                  .replace(/_id$/, "")
-                  .replace(/^_/, "")
-                  // camelCase back: user_profile → userProfile
-                  .replace(/_([a-z])/g, (_, c: string) => c.toUpperCase())
+            //     // Derive a friendly relation field name from the FK column
+            //     // e.g. userId → user, organizationId → organization
+            //     const fkColName = fk.columns[0]?.name ?? ""
+            //     const relationFieldName = fkColName
+            //       .replace(/([A-Z])/g, "_$1")
+            //       .toLowerCase()
+            //       .replace(/_id$/, "")
+            //       .replace(/^_/, "")
+            //       // camelCase back: user_profile → userProfile
+            //       .replace(/_([a-z])/g, (_, c: string) => c.toUpperCase())
 
-                // Avoid duplicating if a field with this name already exists
-                if (!fields.some((f) => f.name === relationFieldName)) {
-                  fields.push({
-                    name: relationFieldName,
-                    type: relatedModelKey, // e.g. "user" — matches another model's export key
-                    notNull: false,
-                    hasDefault: false,
-                    isRelation: true,
-                  })
-                }
-              } catch {
-                // skip malformed FK
-              }
-            }
+            //     // Avoid duplicating if a field with this name already exists
+            //     if (!fields.some((f) => f.name === relationFieldName)) {
+            //       fields.push({
+            //         name: relationFieldName,
+            //         type: relatedModelKey, // e.g. "user" — matches another model's export key
+            //         notNull: false,
+            //         hasDefault: false,
+            //         isRelation: true,
+            //       })
+            //     }
+            //   } catch {
+            //     // skip malformed FK
+            //   }
+            // }
 
             modelDetails.push({
               name: key,

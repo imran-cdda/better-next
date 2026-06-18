@@ -43,8 +43,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu"
-import { ModelInfo } from "@/types/email"
 import { FieldPathPicker } from "./path-picket"
+import { ModelInfo } from "./types/email"
 
 // ============================================================================
 // Types
@@ -305,13 +305,13 @@ function ValueInput({ operator, value, onChange, disabled }: ValueInputProps) {
 
     const handleAdd = () => {
       if (inputVal.trim()) {
-        onChange([...arrValue, inputVal.trim()])
+        onChange([...(arrValue as any), inputVal.trim()])
         setInputVal("")
       }
     }
 
     const handleRemove = (index: number) => {
-      onChange(arrValue.filter((_, i) => i !== index))
+      onChange(arrValue.filter((_, i) => i !== index) as any)
     }
 
     return (
@@ -571,7 +571,7 @@ function ConditionGroupView({
         </Button>
         {depth < 2 && (
           <DropdownMenu>
-            <DropdownMenuTrigger asChild disabled={disabled}>
+            <DropdownMenuTrigger disabled={disabled}>
               <Button type="button" variant="outline" size="sm">
                 <BracesIcon className="size-4" />
                 Add group
@@ -678,7 +678,7 @@ export function EvaluatorBuilder({
 
   // Handle operation change
   const handleOperationChange = (op: "CREATE" | "UPDATE" | "DELETE") => {
-    handleStateChange({ operation: op })
+    handleStateChange({ operation: op } as any)
   }
 
   // Handle fields changed for UPDATE
@@ -688,12 +688,12 @@ export function EvaluatorBuilder({
       .split(",")
       .map((f) => f.trim())
       .filter(Boolean)
-    handleStateChange({ fieldsChanged: fields })
+    handleStateChange({ fieldsChanged: fields } as any)
   }
 
   // Handle root group change
   const handleRootGroupChange = (group: ConditionGroup) => {
-    handleStateChange({ rootGroup: group })
+    handleStateChange({ rootGroup: group } as any)
   }
 
   // Copy to clipboard

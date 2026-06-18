@@ -77,7 +77,7 @@ export function FieldPathPicker({
 
   return (
     <Popover open={open} onOpenChange={handleOpenChange}>
-      <PopoverTrigger asChild disabled={disabled}>
+      <PopoverTrigger disabled={disabled}>
         <Button
           type="button"
           variant="outline"
