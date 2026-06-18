@@ -226,7 +226,7 @@ export default function DatabasePage() {
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Databases</h1>
         <Sheet open={isOpen} onOpenChange={setIsOpen}>
-          <SheetTrigger asChild>
+          <SheetTrigger>
             <Button onClick={handleOpenCreate}>
               <PlusIcon className="size-4" />
               Add Database
@@ -249,7 +249,9 @@ export default function DatabasePage() {
                   <Label htmlFor="provider">Provider</Label>
                   <Select
                     value={formData.provider}
-                    onValueChange={(value) => handleChange("provider", value)}
+                    onValueChange={(value) =>
+                      handleChange("provider", value as any)
+                    }
                   >
                     <SelectTrigger id="provider" className={"w-full"}>
                       <SelectValue placeholder="Select provider" />
@@ -380,15 +382,9 @@ export default function DatabasePage() {
                     <td className="px-4 py-3">
                       <div className="flex items-center justify-center gap-1">
                         {connectionStatus[db.id] === true ? (
-                          <CheckCircleIcon
-                            className="size-4 text-green-500"
-                            title="Connected"
-                          />
+                          <CheckCircleIcon className="size-4 text-green-500" />
                         ) : connectionStatus[db.id] === false ? (
-                          <XCircleIcon
-                            className="size-4 text-destructive"
-                            title="Disconnected"
-                          />
+                          <XCircleIcon className="size-4 text-destructive" />
                         ) : (
                           <span className="text-xs text-muted-foreground">
                             —

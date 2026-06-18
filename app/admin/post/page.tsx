@@ -92,7 +92,7 @@ export default function PostPage() {
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Posts</h1>
         <Sheet open={isOpen} onOpenChange={setIsOpen}>
-          <SheetTrigger asChild>
+          <SheetTrigger>
             <Button>
               <PlusIcon className="size-4" />
               Create Post

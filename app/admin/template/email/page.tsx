@@ -126,7 +126,7 @@ function TemplateRow({ template, onEdit, onDelete }: TemplateRowProps) {
         {new Date(template.createdAt).toLocaleDateString()}
       </div>
       <DropdownMenu>
-        <DropdownMenuTrigger asChild>
+        <DropdownMenuTrigger>
           <Button variant="ghost" size="icon-sm">
             <MoreVerticalIcon className="size-4" />
           </Button>
@@ -383,7 +383,7 @@ function TemplateForm({
             <div className="mb-2 flex items-center justify-between">
               <FieldLabel>Email Body *</FieldLabel>
               <DropdownMenu>
-                <DropdownMenuTrigger asChild disabled={loading}>
+                <DropdownMenuTrigger disabled={loading}>
                   <Button variant="outline" size="sm">
                     {formData.bodyType === "html" ? "HTML" : "Plain Text"}
                     <ChevronDownIcon className="ml-2 size-4" />
