@@ -5,6 +5,7 @@ import { getCurrentDBAdapterAsyncLocalStorage } from "@better-auth/core/context"
 import { drizzle } from "drizzle-orm/node-postgres"
 import pg from "pg"
 import * as schema from "@/core/db/schema/index"
+import { AuthContext, DBAdapter, HookEndpointContext } from "better-auth"
 
 // ---------------------------------------------------------------------------
 // Types
@@ -15,17 +16,22 @@ interface OrgDbEntry {
   db: ReturnType<typeof drizzle>
 }
 
-// ---------------------------------------------------------------------------
-// Org → DB URL map
-// ---------------------------------------------------------------------------
+async function getConnectionStringForDomain(
+  domain: string,
+  adapter: DBAdapter
+) {
+  const getDomainConfig = (await adapter.findOne({
+    model: "database",
+    where: [{ field: "domain", value: domain }],
+  })) as any
 
-const ORG_DB_MAP: Record<string, string> = {
-  "mdimranh.com": "postgresql://postgres:mdimranh@localhost:5432/mdimranh",
-  localhost: "postgresql://postgres:mdimranh@localhost:5432/biwd",
-}
+  const url =
+    domain === "localhost"
+      ? process.env.DATABASE_URL
+      : getDomainConfig
+        ? `postgresql://${getDomainConfig?.user}:${getDomainConfig?.password}@${getDomainConfig?.host}:${getDomainConfig?.port}/${getDomainConfig?.database}`
+        : ""
 
-function getConnectionStringForDomain(domain: string): string {
-  const url = ORG_DB_MAP[domain] ?? process.env.DATABASE_URL
   if (!url) throw new Error(`[org-db] No DB URL for domain: "${domain}"`)
   return url
 }
@@ -36,12 +42,12 @@ function getConnectionStringForDomain(domain: string): string {
 
 const dbCache = new Map<string, OrgDbEntry>()
 
-export function getDbForDomain(domain: string) {
-  const cached = dbCache.get(domain)
-  if (cached) return cached
+export async function getDbForDomain(domain: string, adapter: DBAdapter) {
+  // const cached = dbCache.get(domain)
+  // if (cached) return cached
 
   const pool = new pg.Pool({
-    connectionString: getConnectionStringForDomain(domain),
+    connectionString: await getConnectionStringForDomain(domain, adapter),
     max: 10,
     idleTimeoutMillis: 30_000,
     connectionTimeoutMillis: 5_000,
@@ -75,15 +81,14 @@ process.on("SIGINT", closeAllOrgDbs)
 
 export const dynamicDB = (id: string) => {
   return {
-    matcher: (ctx: any) => {
-      console.log("Matcher -----------------------> ", ctx.context.adapter.id)
+    matcher: (ctx: HookEndpointContext) => {
       return true
     },
     handler: createAuthMiddleware(async (ctx) => {
       const domain = ctx.headers?.get("host")?.split(":")[0]
       if (!domain) return
 
-      const { db } = getDbForDomain(domain)
+      const { db } = await getDbForDomain(domain, ctx.context.adapter)
 
       // Build the org-specific drizzle adapter
       const adapter = drizzleAdapter(db, {
@@ -104,7 +109,7 @@ export const dynamicDB = (id: string) => {
         })
       }
 
-      // Build internalAdapter with org adapter as closure fallback
+      // Build internalAdapter with org adapter
       const internalAdapter = createInternalAdapter(adapter, {
         options: ctx.context.options,
         logger: ctx.context.logger,
@@ -112,19 +117,14 @@ export const dynamicDB = (id: string) => {
         generateId: ctx.context.generateId,
       })
 
-      // 1. Swap references on ctx.context so direct reads see org adapter
+      // Swap references on context so direct reads see org adapter
       Object.assign(ctx.context, { adapter, internalAdapter })
 
-      // 2. Overwrite the ALS store so getCurrentAdapter() returns org
-      //    adapter instead of the init-time memory adapter that
-      //    runWithAdapter() set at the start of this request
+      // Overwrite the ALS store so getCurrentAdapter() returns org adapter
       const als = await getCurrentDBAdapterAsyncLocalStorage()
       const store = als.getStore()
       if (store) {
         store.adapter = adapter
-      } else {
-        // No store means runWithAdapter hasn't run yet (e.g. direct api call)
-        // Nothing to patch — the fallback in createInternalAdapter is enough
       }
     }),
   }

@@ -6,9 +6,9 @@ import { z } from "zod"
 export const Post = (): BetterAuthPlugin =>
   ({
     id: "post",
-    onRequest: DynamicDB(async (request, context) => {
-      console.log("Internal Request ----------------> " + request.url)
-    }),
+    // onRequest: DynamicDB(async (request, context) => {
+    //   console.log("Internal Request ----------------> " + request.url)
+    // }),
     schema: {
       post: {
         fields: {

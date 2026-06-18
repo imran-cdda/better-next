@@ -9,6 +9,9 @@ import { email } from "@/plugins/email"
 import { DBPlugin } from "@/plugins/database/server"
 import { apiKey } from "@better-auth/api-key"
 import { Post } from "@/plugins/post/server"
+import { withPluginHook } from "@/plugins/scoped-hook"
+import { createAuthMiddleware } from "better-auth/api"
+import { dynamicDbHandler } from "@/plugins/database/handler"
 
 export const auth = betterAuth({
   database: drizzleAdapter(db, { provider: "pg", schema }),
@@ -46,6 +49,16 @@ export const auth = betterAuth({
     email(),
     apiKey(),
     Post(),
+    withPluginHook({
+      id: "dynamic-db",
+      plugins: [Post(), email()],
+      before: [dynamicDbHandler],
+      // after: [
+      //   createAuthMiddleware(async (ctx: any) => {
+      //     console.log("Scoped After Hook -----------------> ")
+      //   }),
+      // ],
+    }),
   ],
   logger: {
     level: "debug",

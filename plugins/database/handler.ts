@@ -5,7 +5,7 @@ import { getCurrentDBAdapterAsyncLocalStorage } from "@better-auth/core/context"
 import { drizzle } from "drizzle-orm/node-postgres"
 import pg from "pg"
 import * as schema from "@/core/db/schema/index"
-import { AuthContext, DBAdapter } from "better-auth"
+import { AuthContext, DBAdapter, HookEndpointContext } from "better-auth"
 
 // ---------------------------------------------------------------------------
 // Types
@@ -79,42 +79,41 @@ export async function closeAllOrgDbs() {
 process.on("SIGTERM", closeAllOrgDbs)
 process.on("SIGINT", closeAllOrgDbs)
 
-async function handleOrgDB(request: Request, context: AuthContext) {
-  const domain = request.headers.get("host")?.split(":")[0]
-
+export const dynamicDbHandler = createAuthMiddleware(async (ctx) => {
+  const domain = ctx.headers?.get("host")?.split(":")[0]
   if (!domain) return
 
-  const { db } = await getDbForDomain(domain, context.adapter)
+  const { db } = await getDbForDomain(domain, ctx.context.adapter)
 
   // Build the org-specific drizzle adapter
   const adapter = drizzleAdapter(db, {
     provider: "pg",
     schema,
-  })(context.options)
+  })(ctx.context.options)
 
   // Build databaseHooks entries
   const dbHooks: Array<{
     source: string
-    hooks: NonNullable<typeof context.options.databaseHooks>
+    hooks: NonNullable<typeof ctx.context.options.databaseHooks>
   }> = []
 
-  if (context.options.databaseHooks) {
+  if (ctx.context.options.databaseHooks) {
     dbHooks.push({
       source: "user",
-      hooks: context.options.databaseHooks,
+      hooks: ctx.context.options.databaseHooks,
     })
   }
 
   // Build internalAdapter with org adapter
   const internalAdapter = createInternalAdapter(adapter, {
-    options: context.options,
-    logger: context.logger,
+    options: ctx.context.options,
+    logger: ctx.context.logger,
     hooks: dbHooks,
-    generateId: context.generateId,
+    generateId: ctx.context.generateId,
   })
 
   // Swap references on context so direct reads see org adapter
-  Object.assign(context, { adapter, internalAdapter })
+  Object.assign(ctx.context, { adapter, internalAdapter })
 
   // Overwrite the ALS store so getCurrentAdapter() returns org adapter
   const als = await getCurrentDBAdapterAsyncLocalStorage()
@@ -122,16 +121,4 @@ async function handleOrgDB(request: Request, context: AuthContext) {
   if (store) {
     store.adapter = adapter
   }
-}
-
-export function DynamicDB(
-  onRequest?: (
-    request: Request,
-    ctx: AuthContext
-  ) => Promise<{ response: Response } | { request: Request } | void>
-) {
-  return async (request: Request, context: AuthContext) => {
-    await handleOrgDB(request, context)
-    return onRequest?.(request, context)
-  }
-}
+})

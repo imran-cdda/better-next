@@ -9,14 +9,13 @@ import * as schema from "@/core/db/schema/index"
 import { schemas } from "./schema"
 import { endpoints } from "./endpoints"
 import { dynamicDB } from "./hooks"
-import { DynamicDB } from "./onRequest"
 
 export const DBPlugin = (): BetterAuthPlugin =>
   ({
     id: "database",
-    hooks: {
-      // before: [dynamicDB("database")],
-    },
+    // hooks: {
+    //   before: [dynamicDB("database")],
+    // },
     // onRequest: DynamicDB,
     schema: {
       database: {
