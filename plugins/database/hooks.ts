@@ -43,8 +43,8 @@ async function getConnectionStringForDomain(
 const dbCache = new Map<string, OrgDbEntry>()
 
 export async function getDbForDomain(domain: string, adapter: DBAdapter) {
-  // const cached = dbCache.get(domain)
-  // if (cached) return cached
+  const cached = dbCache.get(domain)
+  if (cached) return cached
 
   const pool = new pg.Pool({
     connectionString: await getConnectionStringForDomain(domain, adapter),
