@@ -29,7 +29,7 @@ async function getConnectionStringForDomain(
     domain === "localhost"
       ? process.env.DATABASE_URL
       : getDomainConfig
-        ? `postgresql://${getDomainConfig?.user}:${getDomainConfig?.password}@${getDomainConfig?.host}:${getDomainConfig?.port}/${getDomainConfig?.database}`
+        ? `postgresql://${getDomainConfig?.user}:${getDomainConfig?.password}@${getDomainConfig?.host}:${getDomainConfig?.port}/${getDomainConfig?.database}?sslmode=require`
         : ""
 
   if (!url) throw new Error(`[org-db] No DB URL for domain: "${domain}"`)
