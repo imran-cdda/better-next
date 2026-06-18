@@ -19,13 +19,7 @@ export const auth = betterAuth({
   baseURL: process.env.BETTER_AUTH_URL!,
   secret: process.env.BETTER_AUTH_SECRET!,
   basePath: "/api/auth",
-  trustedOrigins: [
-    "http://localhost:3000",
-    "http://mdimranh.com:3000",
-    "http://test.com:3000",
-    "http://abc.com:3000",
-    "http://maruf.com:3000",
-  ],
+  trustedOrigins: ["*"],
   emailAndPassword: {
     enabled: true,
   },
