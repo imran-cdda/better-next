@@ -14,6 +14,9 @@ const nextConfig: NextConfig = {
     "abc.com",
     "maruf.com",
   ],
+  outputFileTracingIncludes: {
+    "/**": ["./drizzle/**/*"],
+  },
 }
 
 export default nextConfig
